@@ -2,15 +2,15 @@ version: '3.8'
 services:
   db:
     image: postgres:latest
-    container_name: microservice-fiap-lanchonete-orders
+    container_name: microservice-fiap-hack-send-videos
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: microservice-fiap-lanchonete-orders
+      POSTGRES_DB: microservice-fiap-hack-send-videos
     ports:
       - "5432:5432"
     volumes:
-      - microservice-fiap-lanchonete-orders_data:/var/lib/postgresql/data
+      - microservice-fiap-hack-send-videos_data:/var/lib/postgresql/data
 
 volumes:
-  microservice-fiap-lanchonete-orders_data:
+  microservice-fiap-hack-send-videos_data:

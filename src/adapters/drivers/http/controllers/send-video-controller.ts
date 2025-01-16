@@ -40,11 +40,15 @@ export class SendVideosController {
       throw new BadRequestException('Nenhum arquivo enviado!');
     }
 
-    const fileUrl = await this.uploadVideoUseCase.execute({
+    const result = await this.uploadVideoUseCase.execute({
       file,
       user_id,
     });
-    return { message: 'Upload realizado com sucesso!', fileUrl };
+
+    if (result.isLeft()) {
+      throw new Error('');
+    }
+    return { upload: result.value };
   }
 
   @Get('/:id')
