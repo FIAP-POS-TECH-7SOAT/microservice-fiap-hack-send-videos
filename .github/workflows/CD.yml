@@ -1,0 +1,60 @@
+name: CD -> Build Image and SonarQuob
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: .
+
+      - name: Run unit tests
+        run: npm run test:cov
+        working-directory: .
+
+      - name: Verify coverage report exists
+        run: |
+          if [ -f coverage/unit/lcov.info ]; then
+            echo "Coverage report found."
+          else
+            echo "Coverage report NOT found!" >&2
+            exit 1
+          fi
+        working-directory: .
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t tsrocha901/microservice-fiap-hack-send-videos:latest .
+          docker tag tsrocha901/microservice-fiap-hack-send-videos:latest tsrocha901/microservice-fiap-hack-send-videos:${{ github.sha }}
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: |
+          docker push tsrocha901/microservice-fiap-hack-send-videos:latest
+          docker push tsrocha901/microservice-fiap-hack-send-videos:${{ github.sha }}
+
+
+
