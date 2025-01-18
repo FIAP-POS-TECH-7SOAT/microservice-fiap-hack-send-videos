@@ -35,7 +35,7 @@ export class VideoUsersMapping {
     return {
       id: videoUser.id.toString(),
       created_at: videoUser.created_at,
-      url: videoUser.url,
+      url: videoUser.url ?? '',
       email: videoUser.email,
       phone: videoUser.phone,
       status: videoUser.status,
