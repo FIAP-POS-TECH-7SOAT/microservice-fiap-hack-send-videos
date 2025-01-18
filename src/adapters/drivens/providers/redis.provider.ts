@@ -1,16 +1,14 @@
 import { CacheProvider } from '@core/modules/video/applications/ports/providers/cache.provider';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
+import { EnvService } from '../infra/envs/env.service';
 
 @Injectable()
 export class RedisCacheProvider implements CacheProvider {
   private readonly redis: Redis;
 
-  constructor() {
-    this.redis = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
+  constructor(private readonly env: EnvService) {
+    this.redis = new Redis(this.env.get('REDIS_URL'));
   }
   async listKeys(pattern: string): Promise<string[]> {
     return new Promise((resolve, reject) => {

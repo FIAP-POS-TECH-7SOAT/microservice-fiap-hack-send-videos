@@ -9,6 +9,7 @@ import { EnvModule } from '@adapters/drivens/infra/envs/env.module';
 import DatabaseModule from '@adapters/drivens/infra/database/prisma/database.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ProviderModule } from '@adapters/drivens/providers/provider.module';
+import { RMQModule } from '@adapters/drivers/rmq/rmq.module';
 
 @Module({
   imports: [
@@ -16,7 +17,10 @@ import { ProviderModule } from '@adapters/drivens/providers/provider.module';
     HTTPModule,
 
     ConfigModule.forRoot({
-      validate: (env) => schemaEnv.parse(env),
+      validate: (env) => {
+        env.AMQP_QUEUES = JSON.parse(env.AMQP_QUEUES);
+        return schemaEnv.parse(env);
+      },
       isGlobal: true,
     }),
 
@@ -28,7 +32,7 @@ import { ProviderModule } from '@adapters/drivens/providers/provider.module';
       module: ProviderModule,
       global: true,
     },
-
+    RMQModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
