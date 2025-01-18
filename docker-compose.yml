@@ -12,5 +12,14 @@ services:
     volumes:
       - microservice-fiap-hack-send-videos_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    container_name: microservice-fiap-hack-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   microservice-fiap-hack-send-videos_data:
+  redis_data:

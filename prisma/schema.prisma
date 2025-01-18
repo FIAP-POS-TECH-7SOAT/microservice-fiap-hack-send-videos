@@ -13,10 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model VideoUsers {
-  id         String   @id @default(uuid())
-  user_id   String
-  url String
+  id            String   @id @default(uuid())
+  user_id       String
+  email         String
+  phone         String
+  status        String
+  url           String?
   created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
   
   @@map("video_user")
 }

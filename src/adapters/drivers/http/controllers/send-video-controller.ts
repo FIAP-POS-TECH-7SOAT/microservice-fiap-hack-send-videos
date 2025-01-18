@@ -35,20 +35,24 @@ export class SendVideosController {
   async create(
     @UploadedFile() file: Express.Multer.File,
     @Headers('user_id') user_id: string,
+    @Headers('email') email: string,
+    @Headers('phone') phone: string,
   ) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado!');
     }
 
-    const result = await this.uploadVideoUseCase.execute({
+    this.uploadVideoUseCase.execute({
       file,
       user_id,
+      email,
+      phone,
     });
 
-    if (result.isLeft()) {
-      throw new Error('');
-    }
-    return { upload: result.value };
+    return {
+      status: 200,
+      message: 'Video está sendo enviado e informaremos os proximos status!',
+    };
   }
 
   @Get('/:id')
