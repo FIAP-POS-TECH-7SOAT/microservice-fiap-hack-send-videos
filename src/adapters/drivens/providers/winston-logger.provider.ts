@@ -1,4 +1,4 @@
-import path from 'node:path';
+import * as path from 'node:path';
 import 'winston-daily-rotate-file';
 import winston, { createLogger, format, transports } from 'winston';
 import { LoggerProvider } from '@core/common/ports/logger.provider';

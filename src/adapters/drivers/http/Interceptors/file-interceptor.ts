@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { extname } from 'path';
-import * as multerS3 from 'multer-s3';
+import multerS3 from 'multer-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
