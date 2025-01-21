@@ -14,6 +14,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { EnvService } from '../infra/envs/env.service';
 import { CacheProvider } from '@core/modules/video/applications/ports/providers/cache.provider';
+import { LoggerProvider } from '@core/common/ports/logger.provider';
 
 type PartsUploadFile = { ETag: string; PartNumber: number };
 type isComplete = {
@@ -31,6 +32,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
   constructor(
     private readonly env: EnvService,
     private readonly redisService: CacheProvider,
+    private readonly loggerProvider: LoggerProvider,
   ) {
     this.client = new S3Client({
       region: 'us-east-1',
@@ -54,7 +56,9 @@ export class S3UploadFileProvider implements UploadFileProvider {
           MultipartUpload: { Parts: parts },
         }),
       );
-      console.log(`Todas as partes foram enviadas.`);
+
+      this.loggerProvider.info('Todas as partes do upload foram enviadas');
+
       return true;
     }
     return false;
@@ -81,9 +85,10 @@ export class S3UploadFileProvider implements UploadFileProvider {
         const last_upload = state.parts[state.parts.length - 1];
 
         if (partNumber <= last_upload.PartNumber) {
-          console.log(
+          this.loggerProvider.info(
             `Parte ${partNumber} já tinha sido enviada com sucesso. Pulando para a de numero ${last_upload.PartNumber + 1}`,
           );
+
           isComplete = await this.isComplete({
             fileName,
             part: partNumber,
@@ -155,7 +160,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
             parts: updatedParts,
           });
 
-          console.log(`Parte ${partNumber} enviada com sucesso.`);
+          this.loggerProvider.info(`Parte ${partNumber} enviada com sucesso.`);
 
           isComplete = await this.isComplete({
             fileName,
@@ -167,7 +172,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
           break;
         } catch (error) {
           attempt++;
-          console.error(
+          this.loggerProvider.error(
             `Erro ao enviar parte ${partNumber}. Tentativa ${attempt}/${maxRetries}`,
           );
 
@@ -179,7 +184,10 @@ export class S3UploadFileProvider implements UploadFileProvider {
 
       return { id: uploadId, next_part: partNumber + 1, finished: isComplete };
     } catch (error) {
-      console.error(`Erro no upload da parte ${partNumber}: ${error.message}`);
+      this.loggerProvider.error(
+        `Erro no upload da parte ${partNumber}: ${error.message}`,
+      );
+
       throw error;
     }
   }
@@ -221,7 +229,10 @@ export class S3UploadFileProvider implements UploadFileProvider {
       for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
         // Pular partes já enviadas
         if (parts.find((p) => p.PartNumber === partNumber)) {
-          console.log(`Parte ${partNumber} já enviada. Pulando...`);
+          this.loggerProvider.info(
+            `Parte ${partNumber} já enviada. Pulando...`,
+          );
+
           continue;
         }
 
@@ -235,7 +246,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
         while (attempt < maxRetries) {
           try {
             if (attempt === 0 && partNumber === 3) {
-              console.error('Simulando falha na parte 3...');
+              this.loggerProvider.error('Simulando falha na parte 3...');
               throw new Error('Falha simulada na parte 3');
             }
             uploadPartResponse = await this.client.send(
@@ -254,16 +265,17 @@ export class S3UploadFileProvider implements UploadFileProvider {
 
             // Salvar estado no Redis
             await this.redisService.set(redisKey, { uploadId, parts });
-
-            console.log(
+            this.loggerProvider.info(
               `Parte ${partNumber}/${totalParts} enviada com sucesso.`,
             );
+
             break;
           } catch (error) {
             attempt++;
-            console.error(
+            this.loggerProvider.error(
               `Erro ao enviar parte ${partNumber}. Tentativa ${attempt}/${maxRetries}`,
             );
+
             if (attempt >= maxRetries) {
               throw error;
             }
@@ -281,12 +293,12 @@ export class S3UploadFileProvider implements UploadFileProvider {
         }),
       );
 
-      console.log(`Upload completo: ${fileName}`);
+      this.loggerProvider.info(`Upload completo: ${fileName}`);
 
       // Remover estado do Redis
       await this.redisService.delete(redisKey);
     } catch (error) {
-      console.error(`Erro no upload: ${error.message}`);
+      this.loggerProvider.error(`Erro no upload: ${error.message}`);
       throw error;
     }
   }
@@ -301,7 +313,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
 
     for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
       if (parts.find((p) => p.PartNumber === partNumber)) {
-        console.log(`Parte ${partNumber} já enviada. Pulando...`);
+        this.loggerProvider.info(`Parte ${partNumber} já enviada. Pulando...`);
         continue;
       }
 
@@ -332,11 +344,13 @@ export class S3UploadFileProvider implements UploadFileProvider {
             uploadId,
             parts,
           });
-          console.log(`Parte ${partNumber}/${totalParts} enviada com sucesso.`);
+          this.loggerProvider.info(
+            `Parte ${partNumber}/${totalParts} enviada com sucesso.`,
+          );
           break;
         } catch (error) {
           attempt++;
-          console.error(
+          this.loggerProvider.error(
             `Erro ao enviar parte ${partNumber}. Tentativa ${attempt}`,
           );
           if (attempt >= 3) {
@@ -356,7 +370,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
       }),
     );
 
-    console.log(`Upload completado com sucesso: ${fileName}`);
+    this.loggerProvider.info(`Upload completado com sucesso: ${fileName}`);
     await this.redisService.delete(`upload:${fileName}`);
   }
 }

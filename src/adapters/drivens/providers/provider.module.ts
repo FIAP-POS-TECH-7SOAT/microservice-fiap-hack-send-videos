@@ -6,6 +6,8 @@ import { RedisCacheProvider } from './redis.provider';
 import { CacheProvider } from '@core/modules/video/applications/ports/providers/cache.provider';
 import { RabbitMqPublishMessagingProvider } from './rabbitmq-publish-messaging.provider';
 import { PublishMessagingProvider } from '@core/modules/video/applications/ports/providers/publish-messaging.provider';
+import { WinstonLoggerProvider } from './winston-logger.provider';
+import { LoggerProvider } from '@core/common/ports/logger.provider';
 
 @Module({
   providers: [
@@ -22,9 +24,18 @@ import { PublishMessagingProvider } from '@core/modules/video/applications/ports
       provide: CacheProvider,
       useClass: RedisCacheProvider,
     },
+    {
+      provide: LoggerProvider,
+      useClass: WinstonLoggerProvider,
+    },
     EnvService,
   ],
 
-  exports: [UploadFileProvider, CacheProvider, PublishMessagingProvider],
+  exports: [
+    UploadFileProvider,
+    CacheProvider,
+    PublishMessagingProvider,
+    LoggerProvider,
+  ],
 })
 export class ProviderModule {}
