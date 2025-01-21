@@ -1,3 +1,4 @@
+import { LoggerProvider } from '@core/common/ports/logger.provider';
 import {
   Injectable,
   NestInterceptor,
@@ -10,6 +11,7 @@ import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
+  constructor(private readonly logger: LoggerProvider) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const { method, originalUrl } = context
       .switchToHttp()
@@ -21,7 +23,7 @@ export class LoggingInterceptor implements NestInterceptor {
       .handle()
       .pipe(
         tap(() =>
-          console.log(
+          this.logger.info(
             `${method} ${originalUrl} ${statusCode} - ${Date.now() - now}ms`,
           ),
         ),

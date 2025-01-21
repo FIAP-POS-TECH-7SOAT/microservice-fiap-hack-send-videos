@@ -3,11 +3,13 @@ import { Payload, Ctx, RmqContext, EventPattern } from '@nestjs/microservices';
 import { FileProcessedDTO } from './dtos/file-processed.dto';
 
 import { UpdateVideoReadyUseCase } from '@core/modules/video/applications/use-cases/update-video-ready.use-case';
+import { LoggerProvider } from '@core/common/ports/logger.provider';
 
 @Controller()
 export class FileEventsConsumer {
   constructor(
     private readonly updateVideoReadyUseCase: UpdateVideoReadyUseCase,
+    private readonly logger: LoggerProvider,
   ) {}
 
   @EventPattern('file:processed')
@@ -54,7 +56,7 @@ export class FileEventsConsumer {
 
       channel.ack(originalMsg);
     } catch (error) {
-      console.log('Error', error);
+      this.logger.error(`Erro ${error}`);
 
       throw error;
 
@@ -106,7 +108,7 @@ export class FileEventsConsumer {
 
       channel.ack(originalMsg);
     } catch (error) {
-      console.log('Error', error);
+      this.logger.error(`Erro ${error}`);
 
       throw error;
 
