@@ -1,6 +1,8 @@
 import {
   UploadFileProvider,
   UploadFileProviderProps,
+  UploadPartFileProviderProps,
+  UploadPartFileProviderResponse,
 } from '@core/modules/video/applications/ports/providers/upload-file';
 import { Injectable } from '@nestjs/common';
 
@@ -14,6 +16,14 @@ import { EnvService } from '../infra/envs/env.service';
 import { CacheProvider } from '@core/modules/video/applications/ports/providers/cache.provider';
 import { LoggerProvider } from '@core/common/ports/logger.provider';
 
+type PartsUploadFile = { ETag: string; PartNumber: number };
+type isComplete = {
+  part: number;
+  total: number;
+  fileName: string;
+  uploadId: string;
+  parts: PartsUploadFile[];
+};
 @Injectable()
 export class S3UploadFileProvider implements UploadFileProvider {
   private client: S3Client;
@@ -190,7 +200,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
     // Recuperar estado do Redis (UploadId e partes enviadas)
     const state = await this.redisService.get<{
       uploadId: string;
-      parts: { ETag: string; PartNumber: number }[];
+      parts: PartsUploadFile[];
     }>(redisKey);
 
     let uploadId = state?.uploadId;
@@ -296,7 +306,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
   async resumeUpload(
     fileName: string,
     uploadId: string,
-    parts: { ETag: string; PartNumber: number }[],
+    parts: PartsUploadFile[],
   ): Promise<void> {
     const buffer = await this.redisService.get<Buffer>('buffer:' + fileName);
     const totalParts = Math.ceil(buffer.length / this.PART_SIZE);

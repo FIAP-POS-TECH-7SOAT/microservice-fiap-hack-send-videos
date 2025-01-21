@@ -5,6 +5,8 @@ import { ListVideoByUserUseCase } from './applications/use-cases/list-video-by-u
 import { VideoUsersRepository } from './applications/ports/repositories/video-user-repository';
 import { PrismaVideoUsersRepository } from '@adapters/drivens/infra/database/prisma/repositories/prisma-video-users-repository';
 import { UpdateVideoReadyUseCase } from './applications/use-cases/update-video-ready.use-case';
+import { UploadPartVideoUseCase } from './applications/use-cases/upload-part-video.use-case';
+import { GetLastPartUploadVideoUseCase } from './applications/use-cases/get-last-part-upload-video.use-case';
 
 @Module({
   imports: [],
@@ -13,6 +15,8 @@ import { UpdateVideoReadyUseCase } from './applications/use-cases/update-video-r
     UploadVideoUseCase,
     ListVideoByUserUseCase,
     UpdateVideoReadyUseCase,
+    UploadPartVideoUseCase,
+    GetLastPartUploadVideoUseCase,
     {
       provide: VideoUsersRepository,
       useClass: PrismaVideoUsersRepository,
@@ -22,6 +26,8 @@ import { UpdateVideoReadyUseCase } from './applications/use-cases/update-video-r
     UploadVideoUseCase,
     ListVideoByUserUseCase,
     UpdateVideoReadyUseCase,
+    UploadPartVideoUseCase,
+    GetLastPartUploadVideoUseCase,
   ],
 })
 export class SendVideosModule {}
