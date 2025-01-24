@@ -10,12 +10,13 @@ import DatabaseModule from '@adapters/drivens/infra/database/prisma/database.mod
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ProviderModule } from '@adapters/drivens/providers/provider.module';
 import { RMQModule } from '@adapters/drivers/rmq/rmq.module';
+import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
 
 @Module({
   imports: [
     EnvModule,
     HTTPModule,
-
+    AuthModule,
     ConfigModule.forRoot({
       validate: (env) => {
         env.AMQP_QUEUES = JSON.parse(env.AMQP_QUEUES);

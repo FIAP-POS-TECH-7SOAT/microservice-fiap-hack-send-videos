@@ -23,6 +23,8 @@ import { VideoUserMapping } from '../mapping/videos.mapping';
 import { UploadPartVideoUseCase } from '@core/modules/video/applications/use-cases/upload-part-video.use-case';
 import { CreateUploadPartProps } from './validations';
 import { GetLastPartUploadVideoUseCase } from '@core/modules/video/applications/use-cases/get-last-part-upload-video.use-case';
+import { CurrentUser } from '@adapters/drivens/infra/auth/current-user-decorator';
+import { TokenPayload } from '@adapters/drivens/infra/auth/jwt.strategy';
 
 @Controller('/videos')
 @ApiTags('Videos')
@@ -41,9 +43,7 @@ export class SendVideosController {
   @UseInterceptors(FileInterceptor('video'))
   async create(
     @UploadedFile() file: Express.Multer.File,
-    @Headers('user_id') user_id: string,
-    @Headers('email') email: string,
-    @Headers('phone') phone: string,
+    @CurrentUser() user: TokenPayload,
   ) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado!');
@@ -51,9 +51,9 @@ export class SendVideosController {
 
     this.uploadVideoUseCase.execute({
       file,
-      user_id,
-      email,
-      phone,
+      user_id: user.sub,
+      email: user.user_email,
+      phone: user.phone.replace(/[^0-9]/g, ''),
     });
 
     return {
@@ -67,9 +67,7 @@ export class SendVideosController {
   async sendPart(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: CreateUploadPartProps,
-    @Headers('user_id') user_id: string,
-    @Headers('email') email: string,
-    @Headers('phone') phone: string,
+    @CurrentUser() user: TokenPayload,
   ) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado!');
@@ -78,9 +76,9 @@ export class SendVideosController {
     file.originalname = file_name;
     const response = await this.uploadPartVideoUseCase.execute({
       file,
-      user_id,
-      email,
-      phone,
+      user_id: user.sub,
+      email: user.user_email,
+      phone: user.phone.replace(/[^0-9]/g, ''),
       partNumber: part_number,
       uploadId: upload_id,
       totalParts: total_parts,
