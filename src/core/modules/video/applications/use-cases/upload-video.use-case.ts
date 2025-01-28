@@ -11,6 +11,7 @@ interface RequestProps {
   user_id: string;
   email: string;
   phone: string;
+  title: string;
 }
 type ResponseProps = Either<
   UploadVideoFailsError,
@@ -30,6 +31,7 @@ export class UploadVideoUseCase {
     user_id,
     email,
     phone,
+    title,
   }: RequestProps): Promise<ResponseProps> {
     const fileName = `${user_id}_${file.originalname}`;
     const video = VideoUsers.create({
@@ -37,6 +39,7 @@ export class UploadVideoUseCase {
       user_id,
       email,
       phone,
+      title,
     });
     try {
       await this.uploadFileProvider.upload({ file, fileName });

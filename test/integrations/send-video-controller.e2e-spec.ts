@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import * as kleur from 'kleur';
 
 import * as fs from 'fs';
@@ -74,7 +74,16 @@ describe(kleur.cyan('SendVideosController (e2e)'), () => {
       // Mock user ID and video data creation
       const userId = 'mock-user-id';
       await prisma.videoUsers.createMany({
-        data: [{ id: 'video1', user_id: userId, url: 'Video 1' }],
+        data: [
+          {
+            id: 'video1',
+            user_id: userId,
+            url: 'Video 1',
+            email: 'fake@mail.com',
+            phone: '5511940256580',
+            status: 'processing',
+          },
+        ],
       });
 
       console.log(kleur.cyan('When the videos are requested by user ID'));

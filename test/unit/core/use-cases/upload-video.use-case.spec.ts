@@ -36,6 +36,7 @@ describe('UploadVideoUseCase', () => {
       user_id: mockUserId,
       email: 'mail@mail.com',
       phone: '123456789',
+      title: 'my-file',
     });
 
     const repo = await fakeVideoUsersRepository.getAllByUsers(mockUserId);
