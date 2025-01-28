@@ -1,0 +1,12 @@
+{
+    "default": {
+        "formatOptions": {
+            "snippetInterface": "synchronous",
+            "colorsEnabled": true
+        },
+        "format": [
+            
+            "html:coverage/bdd/cucumber-report.html"
+        ]
+    }
+}

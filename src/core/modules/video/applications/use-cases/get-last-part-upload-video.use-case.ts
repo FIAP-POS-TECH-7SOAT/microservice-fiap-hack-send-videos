@@ -25,6 +25,7 @@ export class GetLastPartUploadVideoUseCase {
       uploadId: string;
       parts: PartsUploadFile[];
     }>(`upload:${fileName}`);
+
     return right({
       part_number: redis?.parts?.length
         ? redis.parts[redis.parts.length - 1].PartNumber
