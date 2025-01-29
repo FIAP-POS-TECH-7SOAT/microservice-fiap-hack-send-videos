@@ -18,7 +18,11 @@ export class RabbitMqPublishMessagingProvider
     const channel = await connection.createChannel();
 
     try {
-      channel.publish(options.exchange, options.routingKey, Buffer.from(data));
+      channel.publish(
+        options.exchange,
+        options.routingKey,
+        Buffer.from(JSON.stringify(data)),
+      );
     } catch (error) {
       console.error('Error publishing message to RabbitMQ:', error);
       throw new Error('Failed to publish message');

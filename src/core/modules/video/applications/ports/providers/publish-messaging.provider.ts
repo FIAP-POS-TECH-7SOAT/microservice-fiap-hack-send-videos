@@ -1,5 +1,5 @@
 export type PublishMessagingProps = {
-  data: string;
+  data: any;
   options: {
     exchange: string;
     routingKey: string;

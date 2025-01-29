@@ -58,20 +58,24 @@ export class UploadPartVideoUseCase {
       await this.videoUsersRepository.create(video);
 
       if (finished) {
+        const routingKey = 'file:uploaded';
         await this.publishMessagingProvider.publish({
-          data: JSON.stringify({
-            id: video.id.toString(),
-            file: fileName,
-            user_id: video.user_id,
-            email: video.email,
-            phone: video.phone,
-            status: video.status,
-            created_at: video.created_at,
-            updated_at: video.updated_at,
-          }),
+          data: {
+            pattern: routingKey,
+            data: {
+              id: video.id.toString(),
+              file: fileName,
+              user_id: video.user_id,
+              email: video.email,
+              phone: video.phone,
+              status: video.status,
+              created_at: video.created_at,
+              updated_at: video.updated_at,
+            },
+          },
           options: {
             exchange: 'amq.direct',
-            routingKey: 'file:uploaded',
+            routingKey,
           },
         });
       }
@@ -81,10 +85,13 @@ export class UploadPartVideoUseCase {
     } catch (_: any) {
       await this.publishMessagingProvider.publish({
         data: JSON.stringify({
-          html: '<p>Não foi possivel carregar seu video, tente novamente</p>',
-          subject: 'Upload de video falhou',
-          text: 'Não foi possivel carregar seu video, tente novamente',
-          to: video.email,
+          pattern: 'notification:email',
+          data: {
+            html: '<p>Não foi possivel carregar seu video, tente novamente</p>',
+            subject: 'Upload de video falhou',
+            text: 'Não foi possivel carregar seu video, tente novamente',
+            to: video.email,
+          },
         }),
         options: {
           exchange: 'amq.direct',
@@ -93,8 +100,11 @@ export class UploadPartVideoUseCase {
       });
       await this.publishMessagingProvider.publish({
         data: JSON.stringify({
-          message: 'Seu video comecou a ser processado',
-          phone: video.phone,
+          pattern: 'notification:sms',
+          data: {
+            message: 'Não foi possivel carregar seu video, tente novamente',
+            phone: video.phone,
+          },
         }),
         options: {
           exchange: 'amq.direct',
