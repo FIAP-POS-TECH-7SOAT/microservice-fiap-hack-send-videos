@@ -11,6 +11,10 @@ import {
   setupTestDatabase,
   teardownTestDatabase,
 } from 'features/setup/prisma-test-setup';
+import { UploadFileProvider } from '@core/modules/video/applications/ports/providers/upload-file';
+import { FakeUploadFileProvider } from 'features/mocks/fake-upload-file-provider';
+import { FakePublishMessagingProvider } from 'features/mocks/fake-publish-message-provider';
+import { PublishMessagingProvider } from '@core/modules/video/applications/ports/providers/publish-messaging.provider';
 
 let app: INestApplication;
 let response: request.Response;
@@ -21,7 +25,12 @@ BeforeAll(async () => {
   await setupTestDatabase();
   const moduleRef: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(UploadFileProvider)
+    .useClass(FakeUploadFileProvider)
+    .overrideProvider(PublishMessagingProvider)
+    .useClass(FakePublishMessagingProvider)
+    .compile();
 
   app = moduleRef.createNestApplication();
   app.useGlobalPipes(); // If using global ValidationPipe

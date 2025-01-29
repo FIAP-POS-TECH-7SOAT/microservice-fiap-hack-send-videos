@@ -2,10 +2,13 @@ import * as path from 'node:path';
 import 'winston-daily-rotate-file';
 import winston, { createLogger, format, transports } from 'winston';
 import { LoggerProvider } from '@core/common/ports/logger.provider';
+import { EnvService } from '../infra/envs/env.service';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class WinstonLoggerProvider implements LoggerProvider {
   private logger: winston.Logger;
-  constructor() {
+  constructor(private readonly env: EnvService) {
     const transport = new winston.transports.DailyRotateFile({
       level: 'info',
       filename: path.join('logs', 'application-%DATE%.log'),
@@ -15,7 +18,7 @@ export class WinstonLoggerProvider implements LoggerProvider {
       maxFiles: '14d',
     });
     const logConfiguration = {
-      level: 'info',
+      level: this.env.get('ENV') === 'test' ? 'silent' : 'info',
       format: format.combine(
         format.timestamp({
           format: 'YYYY-MM-DD HH:mm:ss',

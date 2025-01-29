@@ -14,6 +14,7 @@ import { FileEventsConsumer } from './consumers/file-events.consumer';
 })
 export class RMQModule {
   constructor(private readonly env: EnvService) {
+    if (env.get('ENV') === 'test') return;
     this.setup();
   }
   private async setup() {

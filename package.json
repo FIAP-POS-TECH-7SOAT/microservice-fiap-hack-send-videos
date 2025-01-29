@@ -16,7 +16,7 @@
     "prisma:generate": "npx prisma generate",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
-    "test:bdd": "npx cucumber-js  --require-module ts-node/register --require-module tsconfig-paths/register --require features/**/*.ts --exit",
+    "test:bdd": "SET ENV=test&&npx cucumber-js  --require-module ts-node/register --require-module tsconfig-paths/register --require features/**/*.ts --exit",
     "test:bdd:cov": "npx nyc cucumber-js --require-module ts-node/register --require-module tsconfig-paths/register --require features/**/*.ts --exit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
