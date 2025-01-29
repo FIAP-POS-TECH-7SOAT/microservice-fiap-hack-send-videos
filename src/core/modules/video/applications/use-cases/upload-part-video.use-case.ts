@@ -40,6 +40,7 @@ export class UploadPartVideoUseCase {
   }: RequestProps): Promise<ResponseProps> {
     const fileName = `${user_id}_${file.originalname}`;
     const video = VideoUsers.create({
+      title: fileName,
       url: fileName,
       user_id,
       email,
@@ -111,6 +112,8 @@ export class UploadPartVideoUseCase {
           routingKey: 'notification:sms',
         },
       });
+      video.status = 'error';
+      await this.videoUsersRepository.save(video);
       return left(new UploadVideoFailsError());
     }
   }

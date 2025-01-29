@@ -4,7 +4,7 @@ import { EnvService } from '@adapters/drivens/infra/envs/env.service';
 import { EnvModule } from '@adapters/drivens/infra/envs/env.module';
 import * as amqp from 'amqplib';
 
-import { UpdateVideoReadyUseCase } from '@core/modules/video/applications/use-cases/update-video-ready.use-case';
+import { UpdateVideoReadyUseCase } from '@core/modules/video/applications/use-cases/update-video-status.use-case';
 import { FileEventsConsumer } from './consumers/file-events.consumer';
 
 @Module({

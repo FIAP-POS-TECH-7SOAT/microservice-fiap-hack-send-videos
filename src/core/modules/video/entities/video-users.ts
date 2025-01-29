@@ -2,8 +2,9 @@ import { Optional } from '@core/common/entities/optional';
 import { UniqueEntityID } from '@core/common/entities/unique-entity-id';
 import { Entity } from '@core/common/entities/entity';
 
-export type VideoUsersStatus = 'uploaded' | 'processing' | 'finished';
+export type VideoUsersStatus = 'uploaded' | 'processing' | 'finished' | 'error';
 export interface VideoUsersProps {
+  title: string;
   user_id: string;
   url: string | null;
   status: VideoUsersStatus;
