@@ -6,6 +6,7 @@ import {
   UploadPartFileProviderResponse,
 } from '@core/modules/video/applications/ports/providers/upload-file';
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class FakeUploadFileProvider implements UploadFileProvider {
@@ -19,13 +20,17 @@ export class FakeUploadFileProvider implements UploadFileProvider {
   async uploadPart(
     data: UploadPartFileProviderProps,
   ): Promise<UploadPartFileProviderResponse> {
+    let upload_id = data.uploadId;
     this.loggerProvider.info(
       `${FakeUploadFileProvider.name} [uploadPart] Uploaded file: data ${JSON.stringify(data)}`,
     );
+    if (!upload_id) {
+      upload_id = randomUUID();
+    }
     return {
       finished: true,
-      id: 'fake_id',
-      next_part: 1,
+      id: upload_id,
+      next_part: (data.partNumber || 0) + 1,
     };
   }
   async resumeUpload(

@@ -25,5 +25,6 @@
       "@adapters/*": ["src/adapters/*"],
       
     }
-  }
+  },
+  "include": ["test/**/*.ts","src/**/*.ts","features/**/*.ts", "features/step_definitions/get-last-part.steps.ts"]
 }

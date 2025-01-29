@@ -3,9 +3,7 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpCode,
-  Param,
   Post,
   Query,
   UploadedFile,
@@ -23,8 +21,8 @@ import { VideoUserMapping } from '../mapping/videos.mapping';
 import { UploadPartVideoUseCase } from '@core/modules/video/applications/use-cases/upload-part-video.use-case';
 import { CreateUploadPartProps } from './validations';
 import { GetLastPartUploadVideoUseCase } from '@core/modules/video/applications/use-cases/get-last-part-upload-video.use-case';
-import { CurrentUser } from '@adapters/drivens/infra/auth/current-user-decorator';
 import { TokenPayload } from '@adapters/drivens/infra/auth/jwt.strategy';
+import { CurrentUser } from '@adapters/drivens/infra/auth/current-user-decorator';
 
 @Controller('/videos')
 @ApiTags('Videos')
@@ -49,7 +47,7 @@ export class SendVideosController {
       throw new BadRequestException('Nenhum arquivo enviado!');
     }
 
-    this.uploadVideoUseCase.execute({
+    await this.uploadVideoUseCase.execute({
       file,
       user_id: user.sub,
       email: user.user_email,
@@ -57,8 +55,9 @@ export class SendVideosController {
     });
 
     return {
-      status: 200,
-      message: 'Video está sendo enviado e informaremos os proximos status!',
+      status: 201,
+      message:
+        'The video is being uploaded and we will inform you of the next statuses!',
     };
   }
   @Post('/send-part')
@@ -100,11 +99,11 @@ export class SendVideosController {
   @Get('/last-part')
   async getLastPart(
     @Query('file_name') file_name: string,
-    @Headers('user_id') user_id: string,
+    @CurrentUser() user: TokenPayload,
   ) {
     const response = await this.getLastPartUploadVideoUseCase.execute({
       file_name,
-      user_id,
+      user_id: user.sub,
     });
 
     if (response.isLeft()) {
@@ -118,12 +117,11 @@ export class SendVideosController {
     };
   }
 
-  @Get('/:id')
+  @Get('/')
   @HttpCode(200)
-  @UseInterceptors(FileInterceptor('video'))
-  async listAllByUserId(@Param('id') id: string) {
+  async listAllByUserId(@CurrentUser() user: TokenPayload) {
     const result = await this.listVideoByUserUseCase.execute({
-      id,
+      id: user.sub,
     });
 
     if (result.isLeft()) {
