@@ -7,6 +7,8 @@ export class VideoUserMapping {
       url: videoUsers.url,
       user_id: videoUsers.user_id,
       created_at: videoUsers.created_at,
+      status: videoUsers.status,
+      title: videoUsers.title,
     };
   }
 }

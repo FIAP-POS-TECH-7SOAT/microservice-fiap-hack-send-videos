@@ -5,6 +5,7 @@ import * as pkg from '../../../../../package.json';
 import { LoggingInterceptor } from '../Interceptors/custom-logger-routes';
 
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '@adapters/drivens/infra/auth/public';
 
 @Controller('/info')
 @ApiTags('Info')
@@ -14,6 +15,7 @@ export class InfoController {
 
   @Get('/')
   @HttpCode(200)
+  @Public()
   async info() {
     return {
       version: pkg.version,

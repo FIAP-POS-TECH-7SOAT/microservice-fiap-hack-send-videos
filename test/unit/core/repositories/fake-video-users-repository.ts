@@ -4,6 +4,7 @@ import { VideoUsers } from '@core/modules/video/entities/video-users';
 
 interface VideoUsersRepositoryProps {
   created_at: Date;
+  title: string;
   id: string;
   url: string;
   user_id: string;

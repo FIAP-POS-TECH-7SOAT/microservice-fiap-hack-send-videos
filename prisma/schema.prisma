@@ -14,6 +14,7 @@ datasource db {
 }
 model VideoUsers {
   id            String   @id @default(uuid())
+  title         String?
   user_id       String
   email         String
   phone         String

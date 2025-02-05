@@ -5,17 +5,27 @@ import { UploadFileProvider } from '@core/modules/video/applications/ports/provi
 import { VideoUsersRepository } from '@core/modules/video/applications/ports/repositories/video-user-repository';
 import { FakeUploadFileProvider } from '../providers/fake-upload-file-provider';
 import { FakePublishMessagingProvider } from '../providers/fake-publish-message-provider';
+import { LoggerProvider } from '@core/common/ports/logger.provider';
 
 describe('UploadVideoUseCase', () => {
   let sut: UploadVideoUseCase;
   let fakeUploadFileProvider: UploadFileProvider;
   let fakeVideoUsersRepository: VideoUsersRepository;
   let fakePublishMessagingProvider: FakePublishMessagingProvider;
+  let fakeLoggerProvider: LoggerProvider;
 
   beforeEach(() => {
-    fakeUploadFileProvider = new FakeUploadFileProvider();
+    fakeLoggerProvider = {
+      debug: jest.fn(),
+      error: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+    };
+    fakeUploadFileProvider = new FakeUploadFileProvider(fakeLoggerProvider);
     fakeVideoUsersRepository = new FakeVideoUsersRepository();
-    fakePublishMessagingProvider = new FakePublishMessagingProvider();
+    fakePublishMessagingProvider = new FakePublishMessagingProvider(
+      fakeLoggerProvider,
+    );
 
     sut = new UploadVideoUseCase(
       fakeUploadFileProvider,

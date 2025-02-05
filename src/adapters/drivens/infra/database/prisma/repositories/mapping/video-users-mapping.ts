@@ -16,6 +16,7 @@ export class VideoUsersMapping {
     phone,
     status,
     updated_at,
+    title,
   }: VideoUsersPrisma) {
     return VideoUsers.create(
       {
@@ -26,6 +27,7 @@ export class VideoUsersMapping {
         status: status as VideoUsersStatus,
         updated_at,
         user_id,
+        title: title || '',
       },
       new UniqueEntityID(id),
     );
@@ -41,6 +43,7 @@ export class VideoUsersMapping {
       status: videoUser.status,
       updated_at: videoUser.updated_at,
       user_id: videoUser.user_id,
+      title: videoUser.title,
     };
   }
 }

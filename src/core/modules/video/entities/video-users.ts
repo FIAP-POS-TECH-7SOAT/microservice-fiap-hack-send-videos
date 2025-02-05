@@ -47,6 +47,9 @@ export class VideoUsers extends Entity<VideoUsersProps> {
     this.touch();
   }
 
+  public get title(): string {
+    return this.props.title;
+  }
   public get user_id(): string {
     return this.props.user_id;
   }

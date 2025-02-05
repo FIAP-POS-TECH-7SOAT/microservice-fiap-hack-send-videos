@@ -115,6 +115,7 @@ export class FileEventsConsumer {
       // TODO: Deve lancar um erro apropriado
     }
   }
+
   @EventPattern('file:error')
   async handelFileError(
     @Payload() { id }: FileProcessedDTO,

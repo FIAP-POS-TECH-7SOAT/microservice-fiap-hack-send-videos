@@ -4,12 +4,12 @@ import { EnvService } from '@adapters/drivens/infra/envs/env.service';
 import { EnvModule } from '@adapters/drivens/infra/envs/env.module';
 import * as amqp from 'amqplib';
 
-import { UpdateVideoReadyUseCase } from '@core/modules/video/applications/use-cases/update-video-status.use-case';
+import { UpdateVideoStatusUseCase } from '@core/modules/video/applications/use-cases/update-video-status.use-case';
 import { FileEventsConsumer } from './consumers/file-events.consumer';
 
 @Module({
   imports: [EnvModule],
-  providers: [UpdateVideoReadyUseCase],
+  providers: [UpdateVideoStatusUseCase],
   controllers: [FileEventsConsumer],
 })
 export class RMQModule {
