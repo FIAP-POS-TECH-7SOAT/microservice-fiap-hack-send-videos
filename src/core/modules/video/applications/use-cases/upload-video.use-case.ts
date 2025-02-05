@@ -45,20 +45,24 @@ export class UploadVideoUseCase {
       await this.uploadFileProvider.upload({ file, fileName });
 
       await this.videoUsersRepository.create(video);
+      const routingKey = 'file:uploaded';
       await this.publishMessagingProvider.publish({
-        data: JSON.stringify({
-          id: video.id.toString(),
-          file: fileName,
-          user_id: video.user_id,
-          email: video.email,
-          phone: video.phone,
-          status: video.status,
-          created_at: video.created_at,
-          updated_at: video.updated_at,
-        }),
+        data: {
+          pattern: routingKey,
+          data: {
+            id: video.id.toString(),
+            file: fileName,
+            user_id: video.user_id,
+            email: video.email,
+            phone: video.phone,
+            status: video.status,
+            created_at: video.created_at,
+            updated_at: video.updated_at,
+          },
+        },
         options: {
           exchange: 'amq.direct',
-          routingKey: 'file:uploaded',
+          routingKey,
         },
       });
       return right({ ok: true });
