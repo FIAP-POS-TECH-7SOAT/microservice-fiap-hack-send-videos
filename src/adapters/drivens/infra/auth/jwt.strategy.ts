@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { z } from 'zod';
+import { EnvService } from '../envs/env.service';
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
@@ -16,17 +17,15 @@ export type TokenPayload = z.infer<typeof tokenPayloadSchema>;
 
 @Injectable()
 export class JWTStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    // const jwt_public_key = env.get('JWT_PUBLIC_KEY');
+  constructor(private readonly env: EnvService) {
+    const jwt_public_key = env.get('JWT_PUBLIC_KEY');
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       //   ignoreExpiration: true,
       secretOrKeyProvider: async (request, rawJwtToken, done) => {
         try {
           // Buscando a chave pública do endpoint estático
-          const response = await axios.get(
-            'https://teste-hak-fiap.s3.us-east-1.amazonaws.com/public_key.pem',
-          );
+          const response = await axios.get(jwt_public_key);
           const publicKey = response.data; // A chave pública vem como texto
           done(null, publicKey);
         } catch (error) {
