@@ -14,7 +14,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [envService.get('AMQP_URL')],
-      queue: envService.get<any>('AMQP_QUEUES').FILE_PROCESSED,
+      queue: envService.get<any>('AMQP_QUEUES').FILE_QUEUE.name,
       noAck: false,
       queueOptions: {
         durable: false,
