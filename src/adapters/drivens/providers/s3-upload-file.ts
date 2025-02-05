@@ -35,7 +35,12 @@ export class S3UploadFileProvider implements UploadFileProvider {
     private readonly loggerProvider: LoggerProvider,
   ) {
     this.client = new S3Client({
-      region: 'us-east-1',
+      region: env.get('AWS_REGION'),
+      credentials: {
+        accessKeyId: env.get('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: env.get('AWS_SECRET_ACCESS_KEY'),
+        sessionToken: env.get('AWS_SESSION_TOKEN'),
+      },
     });
     this.BUCKET_NAME = this.env.get('AWS_S3_BUCKET_NAME');
   }
