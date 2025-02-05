@@ -52,6 +52,7 @@ export class SendVideosController {
       user_id: user.sub,
       email: user.user_email,
       phone: user.phone.replace(/[^0-9]/g, ''),
+      title: file.originalname,
     });
 
     return {

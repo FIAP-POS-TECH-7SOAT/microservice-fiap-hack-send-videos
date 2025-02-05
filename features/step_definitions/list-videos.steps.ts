@@ -51,6 +51,7 @@ Given('a user authenticated', async () => {
         email: 'fake@mail.com',
         phone: '551194023025',
         status: 'uploaded',
+        title: 'my title',
       },
       {
         id: 'video2', // Gera um ID único para o segundo vídeo
@@ -59,6 +60,7 @@ Given('a user authenticated', async () => {
         email: 'fake@mail.com',
         phone: '551194023025',
         status: 'uploaded',
+        title: 'my title',
       },
     ],
   });
