@@ -39,13 +39,7 @@ export class UploadPartVideoUseCase {
     totalParts,
   }: RequestProps): Promise<ResponseProps> {
     const fileName = `${user_id}_${file.originalname}`;
-    const video = VideoUsers.create({
-      title: fileName,
-      url: fileName,
-      user_id,
-      email,
-      phone,
-    });
+
     try {
       const { id, next_part, finished } =
         await this.uploadFileProvider.uploadPart({
@@ -56,9 +50,15 @@ export class UploadPartVideoUseCase {
           totalParts: Number(totalParts),
         });
 
-      await this.videoUsersRepository.create(video);
-
       if (finished) {
+        const video = VideoUsers.create({
+          title: fileName,
+          url: fileName,
+          user_id,
+          email,
+          phone,
+        });
+        await this.videoUsersRepository.create(video);
         const routingKey = 'file:uploaded';
         await this.publishMessagingProvider.publish({
           data: {
@@ -91,7 +91,7 @@ export class UploadPartVideoUseCase {
             html: '<p>Não foi possivel carregar seu video, tente novamente</p>',
             subject: 'Upload de video falhou',
             text: 'Não foi possivel carregar seu video, tente novamente',
-            to: video.email,
+            to: email,
           },
         }),
         options: {
@@ -104,7 +104,7 @@ export class UploadPartVideoUseCase {
           pattern: 'notification:sms',
           data: {
             message: 'Não foi possivel carregar seu video, tente novamente',
-            phone: video.phone,
+            phone: phone,
           },
         }),
         options: {
@@ -112,8 +112,7 @@ export class UploadPartVideoUseCase {
           routingKey: 'notification:sms',
         },
       });
-      video.status = 'error';
-      await this.videoUsersRepository.save(video);
+
       return left(new UploadVideoFailsError());
     }
   }
