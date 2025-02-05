@@ -5,6 +5,7 @@ export const schemaEnv = z.object({
   DATABASE_URL: z.string().url(),
   PORT: z.coerce.number().optional().default(3000),
   AWS_S3_BUCKET_NAME: z.string(),
+  JWT_PUBLIC_KEY: z.string(),
   AMQP_QUEUES: z.object({
     FILE_QUEUE: z.object({
       name: z.string(),
