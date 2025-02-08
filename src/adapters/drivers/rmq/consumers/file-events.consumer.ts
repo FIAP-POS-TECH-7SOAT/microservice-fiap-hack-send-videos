@@ -12,7 +12,7 @@ export class FileEventsConsumer {
     private readonly logger: LoggerProvider,
   ) {}
 
-  @EventPattern('file:processed')
+  @EventPattern('upload:processed')
   async handelFileProcessed(
     @Payload() { id, url, status }: FileProcessedDTO,
     @Ctx() context: RmqContext,
@@ -29,14 +29,19 @@ export class FileEventsConsumer {
       if (result.isLeft()) {
         throw result.value;
       }
+
       const { video } = result.value;
+
       channel.publish(
         'amq.direct',
         'notification:sms',
         Buffer.from(
           JSON.stringify({
-            message: 'Seu video está pronto',
-            phone: video.phone,
+            pattern: 'notification:sms',
+            data: {
+              message: 'Seu video está pronto',
+              phone: video.phone,
+            },
           }),
         ),
       );
@@ -46,10 +51,13 @@ export class FileEventsConsumer {
         'notification:email',
         Buffer.from(
           JSON.stringify({
-            html: '<p>Seu video está pronto</p>',
-            subject: 'Processamento de video finalizado',
-            text: 'Seu video está pronto',
-            to: video.email,
+            pattern: 'notification:email',
+            data: {
+              html: '<p>Seu video está pronto</p>',
+              subject: 'Processamento de video finalizado',
+              text: 'Seu video está pronto',
+              to: video.email,
+            },
           }),
         ),
       );
@@ -64,7 +72,7 @@ export class FileEventsConsumer {
     }
   }
 
-  @EventPattern('file:processing')
+  @EventPattern('upload:processing')
   async handelFileUploaded(
     @Payload() { id, url, status }: FileProcessedDTO,
     @Ctx() context: RmqContext,
@@ -87,8 +95,11 @@ export class FileEventsConsumer {
         'notification:sms',
         Buffer.from(
           JSON.stringify({
-            message: 'Seu video comecou a ser processado',
-            phone: video.phone,
+            pattern: 'notification:sms',
+            data: {
+              message: 'Seu video comecou a ser processado',
+              phone: video.phone,
+            },
           }),
         ),
       );
@@ -98,10 +109,13 @@ export class FileEventsConsumer {
         'notification:email',
         Buffer.from(
           JSON.stringify({
-            html: '<p>Seu video comecou a ser processado</p>',
-            subject: 'Processamento de video iniciado',
-            text: 'Seu video comecou a ser processado',
-            to: video.email,
+            pattern: 'notification:email',
+            data: {
+              html: '<p>Seu video comecou a ser processado</p>',
+              subject: 'Processamento de video iniciado',
+              text: 'Seu video comecou a ser processado',
+              to: video.email,
+            },
           }),
         ),
       );
@@ -116,7 +130,7 @@ export class FileEventsConsumer {
     }
   }
 
-  @EventPattern('file:error')
+  @EventPattern('upload:error')
   async handelFileError(
     @Payload() { id }: FileProcessedDTO,
     @Ctx() context: RmqContext,
@@ -138,9 +152,12 @@ export class FileEventsConsumer {
         'notification:sms',
         Buffer.from(
           JSON.stringify({
-            message:
-              'Aconteceu um erro com seu video, favor verificar o upload',
-            phone: video.phone,
+            pattern: 'notification:sms',
+            data: {
+              message:
+                'Aconteceu um erro com seu video, favor verificar o upload',
+              phone: video.phone,
+            },
           }),
         ),
       );
@@ -150,10 +167,13 @@ export class FileEventsConsumer {
         'notification:email',
         Buffer.from(
           JSON.stringify({
-            html: '<p>Aconteceu um erro com seu video, favor verificar o upload</p>',
-            subject: 'Processamento do upload com erro',
-            text: 'Aconteceu um erro com seu video, favor verificar o upload',
-            to: video.email,
+            pattern: 'notification:email',
+            data: {
+              html: '<p>Aconteceu um erro com seu video, favor verificar o upload</p>',
+              subject: 'Processamento do upload com erro',
+              text: 'Aconteceu um erro com seu video, favor verificar o upload',
+              to: video.email,
+            },
           }),
         ),
       );

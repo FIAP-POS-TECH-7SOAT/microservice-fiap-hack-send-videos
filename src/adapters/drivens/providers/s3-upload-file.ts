@@ -17,12 +17,13 @@ import { CacheProvider } from '@core/modules/video/applications/ports/providers/
 import { LoggerProvider } from '@core/common/ports/logger.provider';
 
 type PartsUploadFile = { ETag: string; PartNumber: number };
-type isComplete = {
-  part: number;
+
+type IsCompleteProps = {
   total: number;
   fileName: string;
   uploadId: string;
   parts: PartsUploadFile[];
+  redisKey: string;
 };
 @Injectable()
 export class S3UploadFileProvider implements UploadFileProvider {
@@ -45,14 +46,24 @@ export class S3UploadFileProvider implements UploadFileProvider {
     this.BUCKET_NAME = this.env.get('AWS_S3_BUCKET_NAME');
   }
 
+  private removerDuplicados(arr: any[], chave: any) {
+    return [...new Map(arr.map((obj) => [obj[chave], obj])).values()];
+  }
+
   private async isComplete({
     fileName,
-    part,
     parts,
     total,
     uploadId,
-  }: isComplete) {
-    if (total === part) {
+    redisKey,
+  }: IsCompleteProps) {
+    const my_parts = Array.from({ length: total }, (_, i) => i + 1);
+
+    const partsTocompare = this.removerDuplicados(parts, 'PartNumber').map(
+      (item) => item.PartNumber,
+    );
+
+    if (my_parts.join('') === partsTocompare.join('')) {
       await this.client.send(
         new CompleteMultipartUploadCommand({
           Bucket: this.BUCKET_NAME,
@@ -63,10 +74,21 @@ export class S3UploadFileProvider implements UploadFileProvider {
       );
 
       this.loggerProvider.info('Todas as partes do upload foram enviadas');
-
+      this.redisService.delete(redisKey);
       return true;
     }
     return false;
+  }
+
+  async generateKey(fileName: string): Promise<string> {
+    const createResponse = await this.client.send(
+      new CreateMultipartUploadCommand({
+        Bucket: this.BUCKET_NAME,
+        Key: fileName,
+        ACL: 'private',
+      }),
+    );
+    return createResponse.UploadId!;
   }
   async uploadPart({
     file,
@@ -80,56 +102,6 @@ export class S3UploadFileProvider implements UploadFileProvider {
     let isComplete = false;
 
     try {
-      // Recuperar estado do Redis se o `uploadId` não for fornecido
-
-      const state = await this.redisService.get<{
-        uploadId: string;
-        parts: PartsUploadFile[];
-      }>(redisKey);
-      if (state) {
-        const last_upload = state.parts[state.parts.length - 1];
-
-        if (partNumber <= last_upload.PartNumber) {
-          this.loggerProvider.info(
-            `Parte ${partNumber} já tinha sido enviada com sucesso. Pulando para a de numero ${last_upload.PartNumber + 1}`,
-          );
-
-          isComplete = await this.isComplete({
-            fileName,
-            part: partNumber,
-            parts: state.parts,
-            total: totalParts,
-            uploadId: state.uploadId,
-          });
-          return {
-            id: state.uploadId,
-            next_part: Number(last_upload.PartNumber) + 1,
-            finished: isComplete,
-          };
-        }
-      }
-
-      if (!uploadId) {
-        // tenta pegar do redis
-        uploadId = state?.uploadId;
-
-        // se nao tiver nem no redis, cria um novo
-        if (!uploadId) {
-          // Criar um novo Multipart Upload
-          const createResponse = await this.client.send(
-            new CreateMultipartUploadCommand({
-              Bucket: this.BUCKET_NAME,
-              Key: fileName,
-              ACL: 'private',
-            }),
-          );
-          uploadId = createResponse.UploadId!;
-
-          // Inicializar o estado no Redis
-          await this.redisService.set(redisKey, { uploadId, parts: [] });
-        }
-      }
-
       // Enviar a parte
       let attempt = 0;
       let uploadPartResponse;
@@ -146,33 +118,32 @@ export class S3UploadFileProvider implements UploadFileProvider {
             }),
           );
 
-          // Atualizar estado no Redis
-          const currentState = await this.redisService.get<{
+          const state = await this.redisService.get<{
             uploadId: string;
             parts: PartsUploadFile[];
           }>(redisKey);
 
-          const updatedParts = [
-            ...(currentState?.parts || []),
-            {
-              ETag: uploadPartResponse.ETag!,
-              PartNumber: partNumber,
-            },
-          ];
+          state.parts[partNumber - 1] = {
+            ETag: uploadPartResponse.ETag!,
+            PartNumber: partNumber,
+          };
 
           await this.redisService.set(redisKey, {
             uploadId,
-            parts: updatedParts,
+            totalParts,
+            parts: state.parts,
           });
 
-          this.loggerProvider.info(`Parte ${partNumber} enviada com sucesso.`);
+          this.loggerProvider.info(
+            `Parte ${partNumber}/${totalParts} enviada com sucesso.`,
+          );
 
           isComplete = await this.isComplete({
             fileName,
-            part: partNumber,
-            parts: updatedParts,
+            parts: state.parts,
             total: totalParts,
             uploadId: uploadId,
+            redisKey,
           });
           break;
         } catch (error) {
@@ -205,6 +176,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
     // Recuperar estado do Redis (UploadId e partes enviadas)
     const state = await this.redisService.get<{
       uploadId: string;
+      totalParts: number;
       parts: PartsUploadFile[];
     }>(redisKey);
 
@@ -250,10 +222,6 @@ export class S3UploadFileProvider implements UploadFileProvider {
 
         while (attempt < maxRetries) {
           try {
-            if (attempt === 0 && partNumber === 3) {
-              this.loggerProvider.error('Simulando falha na parte 3...');
-              throw new Error('Falha simulada na parte 3');
-            }
             uploadPartResponse = await this.client.send(
               new UploadPartCommand({
                 Bucket: this.BUCKET_NAME,
@@ -269,7 +237,11 @@ export class S3UploadFileProvider implements UploadFileProvider {
             });
 
             // Salvar estado no Redis
-            await this.redisService.set(redisKey, { uploadId, parts });
+            await this.redisService.set(redisKey, {
+              uploadId,
+              totalParts,
+              parts,
+            });
             this.loggerProvider.info(
               `Parte ${partNumber}/${totalParts} enviada com sucesso.`,
             );
@@ -347,6 +319,7 @@ export class S3UploadFileProvider implements UploadFileProvider {
           // Atualizar estado no Redis
           await this.redisService.set(`upload:${fileName}`, {
             uploadId,
+            totalParts,
             parts,
           });
           this.loggerProvider.info(

@@ -11,7 +11,7 @@ interface RequestProps {
   user_id: string;
   email: string;
   phone: string;
-  uploadId?: string;
+  uploadId: string;
   partNumber: number;
   totalParts: number;
 }
@@ -19,7 +19,6 @@ type ResponseProps = Either<
   UploadVideoFailsError,
   {
     id: string;
-    next_part: number;
   }
 >;
 @Injectable()
@@ -41,14 +40,13 @@ export class UploadPartVideoUseCase {
     const fileName = `${user_id}_${file.originalname}`;
 
     try {
-      const { id, next_part, finished } =
-        await this.uploadFileProvider.uploadPart({
-          file,
-          fileName,
-          partNumber: Number(partNumber),
-          uploadId,
-          totalParts: Number(totalParts),
-        });
+      const { id, finished } = await this.uploadFileProvider.uploadPart({
+        file,
+        fileName,
+        partNumber: Number(partNumber),
+        uploadId,
+        totalParts: Number(totalParts),
+      });
 
       if (finished) {
         const video = VideoUsers.create({
@@ -81,7 +79,7 @@ export class UploadPartVideoUseCase {
         });
       }
 
-      return right({ id, next_part });
+      return right({ id });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_: any) {
       await this.publishMessagingProvider.publish({

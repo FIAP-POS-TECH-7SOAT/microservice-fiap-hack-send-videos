@@ -5,7 +5,7 @@ export type UploadFileProviderProps = {
 export type UploadPartFileProviderProps = {
   file: Express.Multer.File;
   fileName: string;
-  uploadId?: string;
+  uploadId: string;
   partNumber: number;
   totalParts: number;
 };
@@ -19,6 +19,7 @@ export abstract class UploadFileProvider {
     data: UploadPartFileProviderProps,
   ): Promise<UploadPartFileProviderResponse>;
   abstract upload(data: UploadFileProviderProps): Promise<void>;
+  abstract generateKey(fileName: string): Promise<string>;
   abstract resumeUpload(
     fileName: string,
     uploadId: string,

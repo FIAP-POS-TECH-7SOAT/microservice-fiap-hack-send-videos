@@ -13,11 +13,11 @@ type ResponseProps = Either<
   UploadVideoFailsError,
   {
     upload_id?: string;
-    part_number: number;
+    missing_parts: number[];
   }
 >;
 @Injectable()
-export class GetLastPartUploadVideoUseCase {
+export class MissingPartsUploadVideoUseCase {
   constructor(private readonly redisService: CacheProvider) {}
   async execute({ file_name, user_id }: RequestProps): Promise<ResponseProps> {
     const fileName = `${user_id}_${file_name}`;
@@ -27,11 +27,14 @@ export class GetLastPartUploadVideoUseCase {
       parts: PartsUploadFile[];
     }>(`upload:${fileName}`);
 
+    const missingNumbers = Array.from(
+      { length: redis?.totalParts || 0 },
+      (_, i) => i + 1,
+    ).filter((num) => !redis.parts.some((p) => p.PartNumber === num));
+
     return right({
-      part_number: redis?.parts?.length
-        ? redis.parts[redis.parts.length - 1].PartNumber
-        : 1,
       upload_id: redis?.uploadId,
+      missing_parts: missingNumbers,
     });
   }
 }

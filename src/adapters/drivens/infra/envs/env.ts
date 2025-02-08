@@ -7,7 +7,7 @@ export const schemaEnv = z.object({
   AWS_S3_BUCKET_NAME: z.string(),
   JWT_PUBLIC_KEY: z.string(),
   AMQP_QUEUES: z.object({
-    FILE_QUEUE: z.object({
+    UPLOAD_QUEUE: z.object({
       name: z.string(),
       routing_keys: z.array(z.string()),
     }),
