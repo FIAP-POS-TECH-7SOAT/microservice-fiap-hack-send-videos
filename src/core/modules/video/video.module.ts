@@ -7,6 +7,8 @@ import { PrismaVideoUsersRepository } from '@adapters/drivens/infra/database/pri
 import { UpdateVideoStatusUseCase } from './applications/use-cases/update-video-status.use-case';
 import { UploadPartVideoUseCase } from './applications/use-cases/upload-part-video.use-case';
 import { GetLastPartUploadVideoUseCase } from './applications/use-cases/get-last-part-upload-video.use-case';
+import { MissingPartsUploadVideoUseCase } from './applications/use-cases/missing-parts-upload-video.use-case';
+import { CreateKeyUploadPartVideoUseCase } from './applications/use-cases/create-key-upload-part-video.use-case';
 
 @Module({
   imports: [],
@@ -17,6 +19,8 @@ import { GetLastPartUploadVideoUseCase } from './applications/use-cases/get-last
     UpdateVideoStatusUseCase,
     UploadPartVideoUseCase,
     GetLastPartUploadVideoUseCase,
+    MissingPartsUploadVideoUseCase,
+    CreateKeyUploadPartVideoUseCase,
     {
       provide: VideoUsersRepository,
       useClass: PrismaVideoUsersRepository,
@@ -28,6 +32,8 @@ import { GetLastPartUploadVideoUseCase } from './applications/use-cases/get-last
     UpdateVideoStatusUseCase,
     UploadPartVideoUseCase,
     GetLastPartUploadVideoUseCase,
+    MissingPartsUploadVideoUseCase,
+    CreateKeyUploadPartVideoUseCase,
   ],
 })
 export class SendVideosModule {}

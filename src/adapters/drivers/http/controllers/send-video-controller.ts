@@ -19,10 +19,15 @@ import { UploadVideoUseCase } from '@core/modules/video/applications/use-cases/u
 import { ListVideoByUserUseCase } from '@core/modules/video/applications/use-cases/list-video-by-user.use-case';
 import { VideoUserMapping } from '../mapping/videos.mapping';
 import { UploadPartVideoUseCase } from '@core/modules/video/applications/use-cases/upload-part-video.use-case';
-import { CreateUploadPartProps } from './validations';
+import {
+  CreateUploadPartProps,
+  GenerateUploadPartKeyProps,
+} from './validations';
 import { GetLastPartUploadVideoUseCase } from '@core/modules/video/applications/use-cases/get-last-part-upload-video.use-case';
 import { TokenPayload } from '@adapters/drivens/infra/auth/jwt.strategy';
 import { CurrentUser } from '@adapters/drivens/infra/auth/current-user-decorator';
+import { MissingPartsUploadVideoUseCase } from '@core/modules/video/applications/use-cases/missing-parts-upload-video.use-case';
+import { CreateKeyUploadPartVideoUseCase } from '@core/modules/video/applications/use-cases/create-key-upload-part-video.use-case';
 
 @Controller('/videos')
 @ApiTags('Videos')
@@ -34,6 +39,8 @@ export class SendVideosController {
     private readonly listVideoByUserUseCase: ListVideoByUserUseCase,
     private readonly uploadPartVideoUseCase: UploadPartVideoUseCase,
     private readonly getLastPartUploadVideoUseCase: GetLastPartUploadVideoUseCase,
+    private readonly missingPartsUploadVideoUseCase: MissingPartsUploadVideoUseCase,
+    private readonly createKeyUploadPartVideoUseCase: CreateKeyUploadPartVideoUseCase,
   ) {}
 
   @Post('/send')
@@ -93,7 +100,6 @@ export class SendVideosController {
     return {
       status: 200,
       upload_id: response.value.id,
-      next_part: response.value.next_part,
     };
   }
 
@@ -115,6 +121,48 @@ export class SendVideosController {
       status: 200,
       upload_id: response.value.upload_id,
       part_number: response.value.part_number,
+    };
+  }
+  @Get('/missing-parts')
+  async missingParts(
+    @Query('file_name') file_name: string,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    const response = await this.missingPartsUploadVideoUseCase.execute({
+      file_name,
+      user_id: user.sub,
+    });
+
+    if (response.isLeft()) {
+      throw new BadRequestException(`Erro ao buscar ultima parte enviada`);
+    }
+
+    return {
+      status: 200,
+      upload_id: response.value.upload_id,
+      missing_parts: response.value.missing_parts,
+    };
+  }
+
+  @Post('/generate-upload-key')
+  async generateUploadKey(
+    @Body() body: GenerateUploadPartKeyProps,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    const { file_name, total_parts } = body;
+    const response = await this.createKeyUploadPartVideoUseCase.execute({
+      file_name,
+      user_id: user.sub,
+      total_parts,
+    });
+
+    if (response.isLeft()) {
+      throw new BadRequestException(`Erro ao Gerar chave de upload`);
+    }
+
+    return {
+      status: 200,
+      upload_id: response.value.upload_id,
     };
   }
 

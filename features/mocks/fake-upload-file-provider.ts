@@ -11,6 +11,13 @@ import { randomUUID } from 'node:crypto';
 @Injectable()
 export class FakeUploadFileProvider implements UploadFileProvider {
   constructor(private readonly loggerProvider: LoggerProvider) {}
+  async generateKey(fileName: string): Promise<string> {
+    const key = `${randomUUID()}-${fileName}`;
+    this.loggerProvider.info(
+      `${FakeUploadFileProvider.name} [generateKey] Generated key: ${key}`,
+    );
+    return key;
+  }
   async upload({ file, fileName }: UploadFileProviderProps): Promise<void> {
     this.loggerProvider.info(
       `${FakeUploadFileProvider.name} [upload] Uploaded file: data ${JSON.stringify({ file, fileName })}`,

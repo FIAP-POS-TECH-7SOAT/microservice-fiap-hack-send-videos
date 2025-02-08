@@ -49,14 +49,15 @@ export class LoggingInterceptor implements NestInterceptor, ExceptionFilter {
     const { statusCode } = context.switchToHttp().getResponse<Response>();
     const now = Date.now();
 
-    return next
-      .handle()
-      .pipe(
-        tap(() =>
-          this.logger.info(
-            `${LoggingInterceptor.name} [${method}] ${originalUrl} ${statusCode} - ${Date.now() - now}ms`,
-          ),
-        ),
-      );
+    return next.handle().pipe(
+      tap(() => {
+        if (originalUrl === '/info') {
+          return null;
+        }
+        return this.logger.info(
+          `${LoggingInterceptor.name} [${method}] ${originalUrl} ${statusCode} - ${Date.now() - now}ms`,
+        );
+      }),
+    );
   }
 }
