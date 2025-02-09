@@ -10,12 +10,12 @@ import { AppModule } from '../../src/app.module';
 //   teardownTestDatabase,
 // } from 'features/setup/prisma-test-setup';
 
-import { FakeAuthModule } from 'features/mocks/mock-auth.module';
+import { FakeAuthModule } from 'test/mocks/mock-auth.module';
 import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
-import { FakeCacheProvider } from 'features/mocks/fake-cache-provider';
+import { FakeCacheProvider } from 'test/mocks/fake-cache-provider';
 import { CacheProvider } from '@core/modules/video/applications/ports/providers/cache.provider';
 import { UploadFileProvider } from '@core/modules/video/applications/ports/providers/upload-file';
-import { FakeUploadFileProvider } from 'features/mocks/fake-upload-file-provider';
+import { FakeUploadFileProvider } from 'test/mocks/fake-upload-file-provider';
 
 let app: INestApplication;
 
