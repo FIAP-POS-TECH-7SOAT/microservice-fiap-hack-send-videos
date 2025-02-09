@@ -27,6 +27,10 @@ jobs:
         run: npm run test:cov
         working-directory: .
 
+      - name: Run BDD tests
+        run: npm run test:bdd:cov
+        working-directory: .
+
       - name: Verify coverage report exists
         run: |
           if [ -f coverage/unit/lcov.info ]; then
