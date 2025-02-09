@@ -13,8 +13,7 @@ import { UploadFileProvider } from '@core/modules/video/applications/ports/provi
 import { FakeUploadFileProvider } from 'test/mocks/fake-upload-file-provider';
 import { PublishMessagingProvider } from '@core/modules/video/applications/ports/providers/publish-messaging.provider';
 import { FakePublishMessagingProvider } from 'test/mocks/fake-publish-message-provider';
-import { JwtAuthGuard } from '@adapters/drivens/infra/auth/jwt-auth-guard';
-import { FakeJwtAuthGuard } from 'test/mocks/fake-auth-guard-provider';
+
 import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
 import { FakeAuthModule } from 'test/mocks/mock-auth.module';
 

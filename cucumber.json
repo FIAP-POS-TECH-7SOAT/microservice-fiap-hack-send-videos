@@ -1,11 +1,13 @@
 {
     "default": {
+        "require": ["features/step_definitions/**/*.ts"],
+        "paths": ["features/**/*.feature"],
+        "requireModule": ["ts-node/register", "tsconfig-paths/register"],
         "formatOptions": {
             "snippetInterface": "synchronous",
             "colorsEnabled": true
         },
         "format": [
-            
             "html:coverage/bdd/cucumber-report.html"
         ]
     }
