@@ -55,20 +55,25 @@ $ npm run test
 $ npm run test:cov
 
 ```
-![image](https://github.com/user-attachments/assets/4b3e88c5-2077-404c-80f6-aefcf9340c74)
-![image](https://github.com/user-attachments/assets/78948b13-0a5f-4898-8151-20cab006fbcd)
+![image](https://github.com/user-attachments/assets/46a72da4-4d2e-4268-af15-b9c9e0a33890)
+
+
 ```bash
 # e2e tests
 $ npm run test:e2e
 
 
-# e2e test coverage
-$ npm run test:e2e:cov
+# e2e BDD test coverage
+$ npm run test:bdd:cov
 
 
 ```
-![image](https://github.com/user-attachments/assets/eaee8ccd-cb33-476a-a3fd-8a0d94cc95f6)
-![image](https://github.com/user-attachments/assets/dd818741-ce46-4da5-aae9-1c59db8e8691)
+![image](https://github.com/user-attachments/assets/f8d2d65a-d4db-4823-a7b0-264c6635aceb)
+![image](https://github.com/user-attachments/assets/2e8e5eba-7b57-4ed2-9cda-5604aa7ba910)
+![image](https://github.com/user-attachments/assets/ea4ee259-5efa-4668-83fd-938ffce2d4c9)
+
+
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
