@@ -23,7 +23,7 @@ import {
   CreateUploadPartProps,
   GenerateUploadPartKeyProps,
 } from './validations';
-import { GetLastPartUploadVideoUseCase } from '@core/modules/video/applications/use-cases/get-last-part-upload-video.use-case';
+
 import { TokenPayload } from '@adapters/drivens/infra/auth/jwt.strategy';
 import { CurrentUser } from '@adapters/drivens/infra/auth/current-user-decorator';
 import { MissingPartsUploadVideoUseCase } from '@core/modules/video/applications/use-cases/missing-parts-upload-video.use-case';
@@ -38,7 +38,6 @@ export class SendVideosController {
     private readonly uploadVideoUseCase: UploadVideoUseCase,
     private readonly listVideoByUserUseCase: ListVideoByUserUseCase,
     private readonly uploadPartVideoUseCase: UploadPartVideoUseCase,
-    private readonly getLastPartUploadVideoUseCase: GetLastPartUploadVideoUseCase,
     private readonly missingPartsUploadVideoUseCase: MissingPartsUploadVideoUseCase,
     private readonly createKeyUploadPartVideoUseCase: CreateKeyUploadPartVideoUseCase,
   ) {}
@@ -103,26 +102,6 @@ export class SendVideosController {
     };
   }
 
-  @Get('/last-part')
-  async getLastPart(
-    @Query('file_name') file_name: string,
-    @CurrentUser() user: TokenPayload,
-  ) {
-    const response = await this.getLastPartUploadVideoUseCase.execute({
-      file_name,
-      user_id: user.sub,
-    });
-
-    if (response.isLeft()) {
-      throw new BadRequestException(`Erro ao buscar ultima parte enviada`);
-    }
-
-    return {
-      status: 200,
-      upload_id: response.value.upload_id,
-      part_number: response.value.part_number,
-    };
-  }
   @Get('/missing-parts')
   async missingParts(
     @Query('file_name') file_name: string,

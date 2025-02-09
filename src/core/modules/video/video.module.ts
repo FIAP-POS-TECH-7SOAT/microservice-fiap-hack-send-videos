@@ -6,7 +6,7 @@ import { VideoUsersRepository } from './applications/ports/repositories/video-us
 import { PrismaVideoUsersRepository } from '@adapters/drivens/infra/database/prisma/repositories/prisma-video-users-repository';
 import { UpdateVideoStatusUseCase } from './applications/use-cases/update-video-status.use-case';
 import { UploadPartVideoUseCase } from './applications/use-cases/upload-part-video.use-case';
-import { GetLastPartUploadVideoUseCase } from './applications/use-cases/get-last-part-upload-video.use-case';
+
 import { MissingPartsUploadVideoUseCase } from './applications/use-cases/missing-parts-upload-video.use-case';
 import { CreateKeyUploadPartVideoUseCase } from './applications/use-cases/create-key-upload-part-video.use-case';
 
@@ -18,7 +18,7 @@ import { CreateKeyUploadPartVideoUseCase } from './applications/use-cases/create
     ListVideoByUserUseCase,
     UpdateVideoStatusUseCase,
     UploadPartVideoUseCase,
-    GetLastPartUploadVideoUseCase,
+
     MissingPartsUploadVideoUseCase,
     CreateKeyUploadPartVideoUseCase,
     {
@@ -31,7 +31,7 @@ import { CreateKeyUploadPartVideoUseCase } from './applications/use-cases/create
     ListVideoByUserUseCase,
     UpdateVideoStatusUseCase,
     UploadPartVideoUseCase,
-    GetLastPartUploadVideoUseCase,
+
     MissingPartsUploadVideoUseCase,
     CreateKeyUploadPartVideoUseCase,
   ],

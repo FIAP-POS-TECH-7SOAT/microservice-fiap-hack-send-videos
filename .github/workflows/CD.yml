@@ -27,6 +27,23 @@ jobs:
         run: npm run test:cov
         working-directory: .
 
+      - name: Run BDD tests
+        run: npm run test:bdd:cov
+        working-directory: .
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AMQP_URL: ${{ secrets.AMQP_URL }}
+          AMQP_QUEUES: ${{ secrets.AMQP_QUEUES }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+        
+
       - name: Verify coverage report exists
         run: |
           if [ -f coverage/unit/lcov.info ]; then

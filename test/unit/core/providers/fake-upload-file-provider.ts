@@ -11,7 +11,7 @@ import { Injectable } from '@nestjs/common';
 export class FakeUploadFileProvider implements UploadFileProvider {
   constructor(private readonly loggerProvider: LoggerProvider) {}
   async generateKey(fileName: string): Promise<string> {
-    const key = `fake_key_${fileName}_${Date.now()}`;
+    const key = `${fileName}_${Date.now()}`;
     this.loggerProvider.info(
       `${FakeUploadFileProvider.name} [generateKey] Generated key: ${key}`,
     );

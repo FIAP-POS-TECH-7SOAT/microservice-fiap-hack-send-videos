@@ -86,7 +86,7 @@
   "nyc": {
   "include": ["src/**/*.ts"],
   "exclude": ["features/**/*", "tests/**/*"],
-  "reporter": ["text", "html"],
+  "reporter": ["text", "html","lcov"],
   "all": true,
   "report-dir": "coverage/bdd"
 }
