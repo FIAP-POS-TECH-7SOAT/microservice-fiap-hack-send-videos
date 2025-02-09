@@ -1,5 +1,5 @@
 import { Given, When, Then, BeforeAll, AfterAll } from '@cucumber/cucumber';
-import { ExecutionContext, INestApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { TestingModule, Test } from '@nestjs/testing';
 import request from 'supertest';
 import * as fs from 'fs';
@@ -15,8 +15,7 @@ import { UploadFileProvider } from '@core/modules/video/applications/ports/provi
 import { FakeUploadFileProvider } from 'test/mocks/fake-upload-file-provider';
 import { FakePublishMessagingProvider } from 'test/mocks/fake-publish-message-provider';
 import { PublishMessagingProvider } from '@core/modules/video/applications/ports/providers/publish-messaging.provider';
-import { JwtAuthGuard } from '@adapters/drivens/infra/auth/jwt-auth-guard';
-import { FakeJwtAuthGuard } from 'test/mocks/fake-auth-guard-provider';
+
 import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
 import { FakeAuthModule } from 'test/mocks/mock-auth.module';
 
@@ -56,14 +55,28 @@ Given('I am authenticated with a valid token', () => {
 // Step to have the video file
 Given('I have a video file named {string}', (fileName: string) => {
   fakefileName = fileName;
-  const mockFilePath = path.join(__dirname, '..', 'mocks', fileName);
+  const mockFilePath = path.join(
+    __dirname,
+    '..',
+    '..',
+    'test',
+    'mocks',
+    fakefileName,
+  );
   assert.ok(fs.existsSync(mockFilePath), `The file ${fileName} exist.`);
 });
 
 When(
   'I send a POST request to {string} with the video file',
   async (endpoint: string) => {
-    const mockFilePath = path.join(__dirname, '..', 'mocks', fakefileName);
+    const mockFilePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'test',
+      'mocks',
+      fakefileName,
+    );
     const mockFile = fs.createReadStream(mockFilePath);
 
     response = await request(app.getHttpServer())
