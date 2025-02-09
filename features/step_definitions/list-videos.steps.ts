@@ -2,7 +2,7 @@ import { Given, When, Then, BeforeAll, AfterAll } from '@cucumber/cucumber';
 import { TestingModule, Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import jwtDecoded from 'jsonwebtoken';
+
 import request from 'supertest';
 import { strict as assert } from 'assert';
 import { AppModule } from '../../src/app.module';
@@ -12,19 +12,24 @@ import {
 } from 'features/setup/prisma-test-setup';
 import { PrismaService } from '@adapters/drivens/infra/database/prisma/prisma.service';
 
+import { FakeAuthModule } from 'features/mocks/mock-auth.module';
+import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
+
 let app: INestApplication;
 let prisma: PrismaClient;
 let response: request.Response;
 let userId: string;
-const jwt =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZmU0NWRjNC0zNWNkLTRlOWQtODJmNC1jNjBlMGU2Njk0MDEiLCJ1c2VyX2VtYWlsIjoidHNyb2NoYTkwMUBnbWFpbC5jb20iLCJwaG9uZSI6Iis1NTExOTQwMjYwMjgzIiwiZXhwIjoxNzM4NTk1NTU0LCJpYXQiOjE3Mzc5OTA3NTR9.la_morXAevvndgKfKRHc5tQdC6XSw_f2bI11HKn9DCNnxkP9pTcY7ET47ZPYzNKngp4muS5q47aFY6SV9iy1SrwYKBaXp_kQJR51omcY6_-jlZCsimkSqwbXGr6LK9SHCZQ-Z2waKs_KzyAbNeSvyk3iMD26DmeYKDUNWquN0yes7yphChiihw0xPtumobbQZAjacszBC3EA87svVZmRQvUb64KUTVTZtewpTY-46cEfR5IDTeQDBWxJ-vQ7ShmHTHmuuS0U9ATPe_h_5zk5jlFxuK0uM7m50fW3ZYo4njdmAueoMg1QvxLBlBH3DwYcyLAD7GSl_FzptH5NzAlmAw';
 
 BeforeAll(async () => {
   await setupTestDatabase();
 
   const moduleRef: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+
+    .overrideModule(AuthModule)
+    .useModule(FakeAuthModule)
+    .compile();
 
   app = moduleRef.createNestApplication();
   prisma = moduleRef.get(PrismaService);
@@ -38,8 +43,7 @@ AfterAll(async () => {
 
 // Implementação do step 'Given'
 Given('a user authenticated', async () => {
-  const decoded = jwtDecoded.decode(jwt);
-  userId = (decoded?.sub as string) || '';
+  userId = '7fe45dc4-35cd-4e9d-82f4-c60e0e669401';
 
   // Cria os registros no banco de dados com os vídeos para esse usuário
   await prisma.videoUsers.createMany({
@@ -67,8 +71,7 @@ Given('a user authenticated', async () => {
 });
 
 When('I request the videos for the user', async () => {
-  const jwt =
-    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZmU0NWRjNC0zNWNkLTRlOWQtODJmNC1jNjBlMGU2Njk0MDEiLCJ1c2VyX2VtYWlsIjoidHNyb2NoYTkwMUBnbWFpbC5jb20iLCJwaG9uZSI6Iis1NTExOTQwMjYwMjgzIiwiZXhwIjoxNzM4NTk1NTU0LCJpYXQiOjE3Mzc5OTA3NTR9.la_morXAevvndgKfKRHc5tQdC6XSw_f2bI11HKn9DCNnxkP9pTcY7ET47ZPYzNKngp4muS5q47aFY6SV9iy1SrwYKBaXp_kQJR51omcY6_-jlZCsimkSqwbXGr6LK9SHCZQ-Z2waKs_KzyAbNeSvyk3iMD26DmeYKDUNWquN0yes7yphChiihw0xPtumobbQZAjacszBC3EA87svVZmRQvUb64KUTVTZtewpTY-46cEfR5IDTeQDBWxJ-vQ7ShmHTHmuuS0U9ATPe_h_5zk5jlFxuK0uM7m50fW3ZYo4njdmAueoMg1QvxLBlBH3DwYcyLAD7GSl_FzptH5NzAlmAw';
+  const jwt = '_token_';
   response = await request(app.getHttpServer())
     .get(`/videos`)
     .set('Authorization', `Bearer ${jwt}`); // Certifique-se de passar um JWT válido

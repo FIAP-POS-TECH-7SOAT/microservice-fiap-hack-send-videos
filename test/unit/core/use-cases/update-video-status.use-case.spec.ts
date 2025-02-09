@@ -1,7 +1,7 @@
 import { UpdateVideoStatusUseCase } from '@core/modules/video/applications/use-cases/update-video-status.use-case';
 import { VideoUsersRepository } from '@core/modules/video/applications/ports/repositories/video-user-repository';
 import { VideoUsers } from '@core/modules/video/entities/video-users';
-import { left, right } from '@core/common/entities/either';
+import { left } from '@core/common/entities/either';
 import { FakeVideoUsersRepository } from '../repositories/fake-video-users-repository';
 import { UniqueEntityID } from '@core/common/entities/unique-entity-id';
 

@@ -28,6 +28,7 @@ export async function setupTestDatabase() {
     env: {
       ...process.env,
       DATABASE_URL: databaseURL,
+      ENV: 'test',
     },
   });
 
