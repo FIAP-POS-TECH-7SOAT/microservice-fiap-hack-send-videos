@@ -12,7 +12,7 @@ import {
 } from 'features/setup/prisma-test-setup';
 import { PrismaService } from '@adapters/drivens/infra/database/prisma/prisma.service';
 
-import { FakeAuthModule } from 'features/mocks/mock-auth.module';
+import { FakeAuthModule } from 'test/mocks/mock-auth.module';
 import { AuthModule } from '@adapters/drivens/infra/auth/auth.module';
 
 let app: INestApplication;
